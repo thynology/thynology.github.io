@@ -1,14 +1,185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Ủng hộ nghị quyết 57</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>THYNOLOGY — Gradient Glow Text</title>
+  <style>
+    /* ---------- Theme tokens ---------- */
+    :root{
+      --bg: #0b0f14;
+      --fg: #eaf2ff;
+
+      /* Accent gradient stops (tweak freely) */
+      --c1: #7c3aed;  /* violet */
+      --c2: #06b6d4;  /* cyan   */
+      --c3: #10b981;  /* green  */
+      --c4: #f43f5e;  /* rose   */
+
+      /* Glow strength */
+      --glow-a: 44px;
+      --glow-b: 96px;
+    }
+
+    /* Smoother font rendering + a modern default stack */
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      background: radial-gradient(120% 140% at 15% 10%, #0e141b 0%, var(--bg) 55%, #05070a 100%);
+      color: var(--fg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    /* Center the hero */
+    .stage{
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 6vmin;
+      isolation: isolate; /* keep blends local */
+    }
+
+    /* ---------- Background blobs (soft, animated) ---------- */
+    .blobs{
+      position: absolute; inset: -20vmin;
+      filter: blur(40px) saturate(120%);
+      pointer-events: none;
+      z-index: 0;
+      opacity: .85;
+    }
+    .blob{
+      position: absolute;
+      width: 42vmin; height: 42vmin; border-radius: 50%;
+      background: radial-gradient(closest-side, color-mix(in oklab, var(--col) 85%, white 0%) 0%, transparent 70%);
+      mix-blend-mode: screen;
+      animation: drift var(--t, 18s) ease-in-out infinite alternate;
+      transform: translate3d(0,0,0);
+    }
+    .blob:nth-child(1){ --col: var(--c1); top: 8%;  left: 8%;   --t: 20s; }
+    .blob:nth-child(2){ --col: var(--c2); top: 65%; left: 10%;  --t: 22s; }
+    .blob:nth-child(3){ --col: var(--c3); top: 10%; right: 12%; --t: 19s; }
+    .blob:nth-child(4){ --col: var(--c4); bottom: 6%; right: 6%;--t: 24s; }
+
+    @keyframes drift{
+      0%   { transform: translate3d(-4vmin, -3vmin, 0) scale(1.0); }
+      50%  { transform: translate3d( 5vmin,  3vmin, 0) scale(1.05); }
+      100% { transform: translate3d(-2vmin,  4vmin, 0) scale(1.02); }
+    }
+
+    /* ---------- Title ---------- */
+    .title{
+      position: relative;
+      z-index: 1;
+      line-height: .95;
+      letter-spacing: .02em;
+      font-weight: 900;
+      font-size: clamp(3rem, 12vw, 11rem);
+      margin: 0;
+      /* Text as gradient mask */
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      background:
+        /* rotating conic gradient provides a lively color flow inside the text */
+        conic-gradient(from var(--a, 0deg) at 50% 50%,
+          var(--c1), var(--c2), var(--c3), var(--c4), var(--c1));
+      background-size: 100% 100%;
+      background-clip: text;
+      -webkit-background-clip: text;
+
+      /* Soft neon glow (outer) */
+      filter:
+        drop-shadow(0 0 var(--glow-a) color-mix(in oklab, var(--c2) 55%, transparent 45%))
+        drop-shadow(0 0 var(--glow-b) color-mix(in oklab, var(--c1) 40%, transparent 60%));
+      will-change: filter;
+    }
+
+    /* Subtle crisp outline for legibility on dark backgrounds */
+    .title::before{
+      content: attr(data-text);
+      position: absolute; inset: 0;
+      /* faint stroke using multiple shadows for cross-browser consistency */
+      text-shadow:
+        0 0 .5px rgba(255,255,255,.25),
+        0 0 1px rgba(255,255,255,.18),
+        0 0 8px rgba(255,255,255,.06);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* Shimmer sweep across the text */
+    .title::after{
+      content: attr(data-text);
+      position: absolute; inset: 0;
+      background: linear-gradient(115deg,
+        transparent 0%,
+        rgba(255,255,255,.0) 40%,
+        rgba(255,255,255,.85) 50%,
+        rgba(255,255,255,.0) 60%,
+        transparent 100%);
+      background-size: 250% 100%;
+      background-position: -120% 0;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      mix-blend-mode: screen;
+      animation: shine 3.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* Animate the conic gradient by rotating its start angle */
+    @property --a {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+    .title { animation: spin 16s linear infinite; }
+    @keyframes spin { to{ --a: 360deg; } }
+
+    @keyframes shine {
+      0%   { background-position: -120% 0; opacity: .0; }
+      8%   { opacity: .85; }
+      35%  { background-position: 120% 0; opacity: .0; }
+      100% { background-position: 120% 0; opacity: .0; }
+    }
+
+    /* Helpful fallback for older browsers without @property or conic-gradient */
+    @supports not (background: conic-gradient(from 0deg, red, blue)) {
+      .title{
+        background:
+          linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c4), var(--c1));
+        background-size: 300% 100%;
+        animation: slide 16s linear infinite;
+      }
+      @keyframes slide { to { background-position: 200% 0; } }
+    }
+
+    /* Respect reduced-motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      .blob, .title, .title::after { animation: none !important; }
+    }
+
+    /* Tiny caption (optional) */
+    .note{
+      position: absolute; bottom: 2.2rem; left: 50%; transform: translateX(-50%);
+      opacity: .6; font-size: .9rem; letter-spacing: .02em;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-    <p>Ủng hộ nghị quyết 57 bởi TBT TÔ LÂM. Hãy liên hệ tranlaman+thynology@gmail.com để hợp tác phát triển sản phẩm: AI và blockchain.</p>
+  <main class="stage">
+    <div class="blobs" aria-hidden="true">
+      <span class="blob"></span>
+      <span class="blob"></span>
+      <span class="blob"></span>
+      <span class="blob"></span>
+    </div>
 
-    <a href="http://www.easycounter.com/">
-    <img src="http://www.easycounter.com/counter.php?beahacker" border="0" alt="Free Web Counter"></a> <i><font face="Arial" size="2"> since Oct 2015</font></i>
-    
+    <!-- Change the word once here -->
+    <h1 class="title" data-text="THYNOLOGY">THYNOLOGY</h1>
+
+    <div class="note">Ủng hộ nghị quyết 57 bởi TBT TÔ LÂM. Hãy liên hệ thynology@gmail.com để hợp tác phát triển sản phẩm: AI và blockchain.</div>
+  </main>
 </body>
 </html>
